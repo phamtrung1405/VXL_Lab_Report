@@ -1,0 +1,54 @@
+\section{Exercise 3 - Lab 3}
+
+Yêu cầu: Tạo dự án STM32CubeIDE/STM32CubeMX, thiết lập cấu hình các chân GPIO cho 3 nút nhấn, 12 LED giao thông, 4 LED 7 đoạn và cấu hình ngắt Timer 2 với chu kỳ $10\text{ms}$ phục vụ quét nút nhấn và quét hiển thị[cite: 14, 21, 22].
+
+\textbf{Cấu hình Pinout (File .ioc)}
+Các chân ngoại vi trên vi điều khiển STM32F103C6 được thiết lập chi tiết trong Bảng~\ref{tab:ex3_pinout}.
+
+\begin{table}[htbp]
+\centering
+\caption{Bảng phân hoạch chân I/O hệ thống trong STM32CubeMX}
+\label{tab:ex3_pinout}
+\begin{tabular}{|c|c|c|c|l|}
+\hline
+\textbf{Chân} & \textbf{Chế độ (Mode)} & \textbf{Pull-up / Speed} & \textbf{User Label} & \textbf{Chức năng} \\ \hline
+PB0 & GPIO\_Input & Pull-up & \texttt{BUTTON\_1} & Nút chọn Mode (Mode 1--4)[cite: 21] \\ \hline
+PB1 & GPIO\_Input & Pull-up & \texttt{BUTTON\_2} & Nút tăng thời gian ($1 \rightarrow 99$)[cite: 21] \\ \hline
+PB2 & GPIO\_Input & Pull-up & \texttt{BUTTON\_3} & Nút lưu giá trị (Set)[cite: 21] \\ \hline
+PA0 -- PA11 & GPIO\_Output & Output Push-Pull & \texttt{RED\_1} -- \texttt{GRN\_4} & 12 LED giao thông[cite: 21] \\ \hline
+PB3 -- PB9 & GPIO\_Output & Output Push-Pull & \texttt{SEG\_A} -- \texttt{SEG\_G} & 7 thanh dữ liệu LED 7 đoạn \\ \hline
+PB10 -- PB13 & GPIO\_Output & Output Push-Pull & \texttt{EN\_0} -- \texttt{EN\_3} & 4 chân quét chọn LED 7 đoạn \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Cấu hình Timer 2 Ngắt $10\text{ms}$}
+Để tạo chu kỳ ngắt chính xác $10\text{ms}$ với tần số xung nhịp hệ thống $8\text{MHz}$[cite: 14, 22]:
+\begin{itemize}
+    \item \textbf{Clock Source}: Internal Clock.
+    \item \textbf{Prescaler (PSC)}: $7999$ (đưa tần số định thời về $8\text{MHz} / (7999 + 1) = 1\text{kHz}$, tương ứng $1\text{ms}$/tick).
+    \item \textbf{Counter Period (ARR)}: $9$ (đếm 10 ticks từ $0 \rightarrow 9$, tương ứng khoảng thời gian ngắt $10\text{ms}$).
+    \item \textbf{NVIC Settings}: Kích hoạt ngắt toàn cục \texttt{TIM2 global interrupt} (Tick chọn \texttt{Enabled}).
+\end{itemize}
+
+\textbf{Kết quả khởi tạo}
+Sau khi thực hiện \textit{Generate Code}, STM32CubeMX tự động sinh các hàm khởi tạo ngoại vi trong \texttt{main.c}[cite: 20]:
+\begin{itemize}
+    \item \texttt{MX\_GPIO\_Init()}: Cấu hình các chân điều khiển LED là Output và các chân nút nhấn là Input với điện trở kéo lên (\textit{Pull-up})[cite: 10, 20].
+    \item \texttt{MX\_TIM2\_Init()}: Khởi tạo các thông số thanh ghi cho Timer 2[cite: 20].
+\end{itemize}
+
+Để khởi động Timer 2 ở chế độ ngắt trong chương trình chính, ta thêm lệnh sau trước vòng lặp \texttt{while(1)}:
+
+\begin{lstlisting}[language=C, caption={Khởi động ngắt Timer 2 trong main.c}]
+/* Initialize all configured peripherals */
+MX_GPIO_Init();
+MX_TIM2_Init();
+
+/* Start Timer 2 in Interrupt mode */
+HAL_TIM_Base_Start_IT(&htim2);
+
+while (1)
+{
+    /* Super loop */
+}
+\end{lstlisting}

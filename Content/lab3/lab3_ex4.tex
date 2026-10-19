@@ -1,0 +1,74 @@
+\section{Exercise 4 - Lab 3}
+
+Yêu cầu: Trong các ứng dụng nhúng, chu kỳ ngắt Timer phần cứng có thể thay đổi tùy theo yêu cầu hệ thống. Nếu các giá trị đếm thời gian được thiết lập cứng, toàn bộ các tác vụ đếm chu kỳ (như nháy LED $2\text{Hz}$, đếm ngược $1\text{s}$) sẽ bị sai lệch nghiêm trọng.
+
+Mục tiêu của Bài tập 4 là xây dựng một lớp trừu tượng hóa Software Timer dựa trên hằng số \texttt{TIMER\_CYCLE}. Khi chu kỳ ngắt của Timer phần cứng thay đổi, người lập trình chỉ cần cập nhật duy nhất hằng số \texttt{TIMER\_CYCLE} mà không cần chỉnh sửa bất kỳ dòng mã nguồn nào ở các tầng ứng dụng FSM bên trên.
+
+\textbf{Thiết kế Software Timer dùng Mảng và \texttt{TIMER\_CYCLE}}
+
+\textbf{Cấu trúc dữ liệu}
+Để quản lý đồng thời nhiều tác vụ định thời độc lập (như quét LED, nháy LED $2\text{Hz}$, đếm ngược $1\text{s}$), hệ thống sử dụng mảng biến toàn cục quản lý theo chỉ số \texttt{index}:
+\begin{itemize}
+    \item \texttt{TIMER\_CYCLE}: Chu kỳ ngắt phần cứng tính bằng miligiây ($\text{ms}$). Với cấu hình TIM2 ngắt $10\text{ms}$, ta khai báo \texttt{\#define TIMER\_CYCLE 10}.
+    \item \texttt{timer\_counter[4]}: Mảng lưu số tick còn lại của từng Software Timer.
+    \item \texttt{timer\_flag[4]}: Mảng cờ báo hiệu khi một Software Timer tương ứng đếm xong ($0 \rightarrow 1$).
+\end{itemize}
+
+\textbf{Công thức quy đổi tự động}
+Hàm \texttt{setTimer(index, duration)} tiếp nhận khoảng thời gian mong muốn \texttt{duration} ($\text{ms}$) và tự động quy đổi ra số lần ngắt (tick) tương ứng theo công thức:
+\[
+\text{timer\_counter}[index] = \frac{\text{duration}}{\text{TIMER\_CYCLE}}
+\]
+
+\textbf{Mã nguồn Cài đặt (\texttt{timer.h} và \texttt{timer.c})}
+\begin{lstlisting}[language=C, caption={File timer.h}]
+#ifndef INC_TIMER_H_
+#define INC_TIMER_H_
+
+void setTimer(int index, int duration);
+void timer_run(void);
+
+
+#endif /* INC_TIMER_H_ */
+\end{lstlisting}
+
+\begin{lstlisting}[language=C, caption={Khởi động ngắt Timer 2 trong main.c}]
+#include "main.h"
+#include "timer.h"
+#include "input_reading.h"
+
+extern int time_buffer[4];
+extern int timer_counter[4];
+extern int timer_flag[4];
+extern int TIMER_CYCLE;
+
+void setTimer(int index, int duration){
+    timer_counter[index] = duration / TIMER_CYCLE;
+    timer_flag[index] = 0;
+}
+
+void timer_run(){
+    for(int i = 0; i < 4; i++){
+        if(timer_counter[i] > 0){
+            timer_counter[i]--;
+            if(timer_counter[i] == 0) timer_flag[i] = 1;
+        }
+    }
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM2) {
+        button_reading();
+        timer_run();
+    }
+}
+\end{lstlisting}
+
+
+
+
+\textbf{Đánh giá và Kết quả}
+\begin{itemize}
+    \item \textbf{Độ linh hoạt cao}: Khi ngắt \texttt{TIM2} cài đặt $10\text{ms}$ (\texttt{TIMER\_CYCLE = 10}), gọi \texttt{setTimer(0, 500)} phục vụ nháy LED $2\text{Hz}$ sẽ tự động tính số tick là $500 / 10 = 50$ ticks.
+    \item \textbf{Dễ dàng bảo trì}: Nếu sau này trong STM32CubeMX chu kỳ ngắt \texttt{TIM2} được đổi thành $1\text{ms}$, ta chỉ cần đổi \texttt{\#define TIMER\_CYCLE 1}. Lệnh \texttt{setTimer(0, 500)} sẽ tự động tính ra $500 / 1 = 500$ ticks, giữ nguyên chính xác khoảng thời gian $500\text{ms}$ mà không làm lệch tần số hoạt động của ứng dụng.
+\end{itemize}

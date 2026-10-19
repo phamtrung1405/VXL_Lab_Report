@@ -1,0 +1,69 @@
+\section{Exercise 10 - Lab 1}
+Yêu cầu:Tích hợp toàn bộ các hàm đã xây dựng từ những bài tập trước để tạo thành một hệ thống đồng hồ sử dụng 12 đèn LED[cite: 30]. Tại bất kỳ thời điểm nào, chỉ có 3 đèn LED được phép bật sáng để thể hiện lần lượt 3 thông tin: giờ, phút và giây[cite: 30].
+
+Ý tưởng: 12 bóng LED này được kết nối trực tiếp với 12 chân GPIO liên tiếp của vi điều khiển STM32, bắt đầu từ chân \texttt{PA4} đến \texttt{PA15}[cite: 29]. Nhóm chọn chân \texttt{PA15} tương ứng với vị trí 12 giờ, \texttt{PA4} là 1 giờ. Để điều khiển đồng hồ, hệ thống sử dụng lại các hàm phụ trợ đã được yêu cầu ở các bài tập 7, 8 và 9[cite: 30]. Do phút và giây là từ 0 đến 59, trong khi mặt đồng hồ chỉ có 12 vị trí (0 đến 11), hệ thống chia lấy phần nguyên của giá trị phút và giây cho 5 để ánh xạ vào đúng vị trí của đèn LED tương ứng. Nhịp đếm thời gian 1 giây được tạo ra thông qua hàm \texttt{HAL\_Delay(1000)}. Trong trường hợp giá trị của kim giây, kim phút và kim giờ trùng nhau tại một vị trí, chân GPIO tương ứng của vị trí đó vẫn sẽ duy trì trạng thái mức cao (bật sáng) bình thường.
+
+\begin{lstlisting}[language=C, caption={Tích hợp}, label={lst:Integrate}]]
+
+int hour = 0;
+int minute = 0;
+int second = 0;
+void clearAllClock() {
+    for(int i = 0; i < 12; i++) {
+        HAL_GPIO_WritePin(GPIOA, pins[i], GPIO_PIN_RESET);
+    }
+}
+void setNumberOnClock(int num) {
+    if(num >= 0 && num <= 11) {
+        HAL_GPIO_WritePin(GPIOA, pins[num], GPIO_PIN_SET);
+    }
+}
+void clearNumberOnClock(int num) {
+    if(num >= 0 && num <= 11) {
+        HAL_GPIO_WritePin(GPIOA, pins[num], GPIO_PIN_RESET);
+    }
+}
+
+/* USER CODE BEGIN WHILE */
+  while (1)
+  {
+	      clearAllClock();
+
+
+	      int second_pos = second / 5;
+	      int minute_pos = minute / 5;
+	      int hour_pos = hour;
+
+
+	      setNumberOnClock(second_pos);
+	      setNumberOnClock(minute_pos);
+	      setNumberOnClock(hour_pos);
+
+
+	      HAL_Delay(10);
+
+
+	      second++;
+	      if(second >= 60) {
+	          second = 0;
+	          minute++;
+	      }
+	      if(minute >= 60) {
+	          minute = 0;
+	          hour++;
+	      }
+	      if(hour >= 12) {
+	          hour = 0;
+	      }
+  /* USER CODE END WHILE */
+  }
+\end{lstlisting}
+
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=13cm]{Report/graphics/lab1_ex10.png}
+\end{center}
+\caption{Mô phỏng mạch tích hợp}
+\label{fig:1}
+\end{figure}

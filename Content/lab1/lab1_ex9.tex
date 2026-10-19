@@ -1,0 +1,12 @@
+\section{Exercise 9 - Lab 1}
+Yêu cầu: Hiện thực hàm clearNumberOnClock(int num). Giá trị đầu vào cho hàm này nằm trong khoảng từ 0 đến 11, và đèn LED tương ứng sẽ tắt.
+
+Ý tưởng: Hàm nhận tham số đầu vào là vị trí của LED (từ 0 đến 11) và sử dụng mảng \texttt{pins} để xác định chân GPIO cần xuất tín hiệu tắt \texttt{GPIO\_PIN\_RESET}.
+
+\begin{lstlisting}[language=C, caption={Hàm clearNumberOnClock}, label={lst:set_number_on_clock}]
+void clearNumberOnClock(int num) {
+    if(num >= 0 && num <= 11) {
+        HAL_GPIO_WritePin(GPIOA, pins[num], GPIO_PIN_RESET);
+    }
+}
+\end{lstlisting}

@@ -1,0 +1,13 @@
+\section{Exercise 8 - Lab 1}
+
+Yêu cầu: Hiện thực hàm setNumberOnClock(int num). Giá trị đầu vào cho hàm này nằm trong khoảng từ 0 đến 11, và đèn LED tương ứng sẽ bật.
+
+Ý tưởng: Hàm nhận tham số đầu vào là vị trí của LED (từ 0 đến 11) và sử dụng mảng \texttt{pins} để xác định chân GPIO cần xuất tín hiệu  (\texttt{GPIO\_PIN\_SET}).
+
+\begin{lstlisting}[language=C, caption={Hàm setNumberOnClock}, label={lst:set_number_on_clock}]
+void setNumberOnClock(int num) {
+    if(num >= 0 && num <= 11) {
+        HAL_GPIO_WritePin(GPIOA, pins[num], GPIO_PIN_SET);
+    }
+}
+\end{lstlisting}

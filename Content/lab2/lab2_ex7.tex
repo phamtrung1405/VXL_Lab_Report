@@ -1,0 +1,55 @@
+\section{Exercise 7 - Lab 2}
+
+Yêu cầu: Nâng cấp mã nguồn của Bài tập 5 (đồng hồ số cập nhật giờ, phút, giây) bằng cách áp dụng timer phần mềm và xóa bỏ hàm \texttt{HAL\_Delay()}. Chuyển tác vụ nhấp nháy đèn DOT vào trong hàm \texttt{main()} thay vì để trong ngắt.
+
+Ý tưởng: Mở rộng timer phần mềm thành mảng để  nhiều tác vụ đồng thời. Cấp phát timer 0 cho đèn DOT và timer 1 cho đèn LED. Bên trong vòng lặp while, ta kiểm tra cờ của từng timer một cách độc lập. Khi cờ bật, ta xử lý logic tương ứng và cài đặt lại timer đó.
+
+\begin{lstlisting}[language=C, caption={Phần code hiện thực}, label={lst:ex6_lab2}]
+    setTimer(0, 500);  // DOT (500ms)
+    setTimer(1, 1000); //  Clock & LED_RED (1000ms)
+    HAL_TIM_Base_Start_IT(&htim2);
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+    while (1)
+    {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+        if(timer_flag[0] == 1){
+            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+            setTimer(0, 500);
+        }
+        if(timer_flag[1] == 1){
+            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+
+            second++;
+            if(second >= 60) {
+                second = 0;
+                minute++;
+            }
+            if(minute >= 60) {
+                minute = 0;
+                hour++;
+            }
+            if(hour >= 24) {
+                hour = 0;
+            }
+            updateClockBuffer();
+            setTimer(1, 1000);
+        }
+    }
+  /* USER CODE END 3 */
+    void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+    	if(htim->Instance == TIM2){
+    		timer_run();
+    		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8
+                                        |GPIO_PIN_9, GPIO_PIN_SET);
+    		update7SEG(index_led);
+	}
+
+}
+\end{lstlisting}
+

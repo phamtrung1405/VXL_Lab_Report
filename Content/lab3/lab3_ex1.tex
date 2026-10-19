@@ -1,0 +1,98 @@
+\section{Exercise 1 - Lab 3}
+
+Yêu cầu: Thiết kế và phác thảo Máy trạng thái hữu hạn (FSM) cho hệ thống đèn giao thông tại ngã tư đáp ứng các yêu cầu sau:
+\begin{itemize}
+    \item Điều khiển 12 đèn LED (4 Đỏ, 4 Vàng, 4 Xanh) và 4 LED 7 đoạn (2 LED hiển thị giá trị thời gian, 2 LED hiển thị chế độ hoạt động).
+    \item Sử dụng 3 nút nhấn:
+    \begin{itemize}
+        \item \textbf{Button 1}: Chuyển đổi giữa các chế độ (Mode 1 $\rightarrow$ Mode 2 $\rightarrow$ Mode 3 $\rightarrow$ Mode 4 $\rightarrow$ Mode 1).
+        \item \textbf{Button 2}: Tăng giá trị thời gian cài đặt ($1 \rightarrow 99$).
+        \item \textbf{Button 3}: Lưu (Set) giá trị thời gian vừa cài đặt.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Mô tả Tín hiệu và Trạng thái FSM
+}
+\textbf{Tín hiệu Input / Output}
+\begin{itemize}
+    \item \textbf{Inputs}: \texttt{is\_button\_pressed(0)} (Button 1), \texttt{is\_button\_pressed(1)} (Button 2), \texttt{is\_button\_pressed(2)} (Button 3).
+    \item \textbf{Outputs}: Trạng thái hiển thị 12 LED giao thông, mã chế độ (\texttt{MODE\_01} đến \texttt{MODE\_04}) và giá trị thời gian đếm ngược/cài đặt trên 4 LED 7 đoạn.
+\end{itemize}
+
+\textbf{Chi tiết các trạng thái}
+\begin{enumerate}
+    \item \textbf{MODE 1 - Chế độ tự động:}
+    \begin{itemize}
+        \item \textit{Hành vi}: Hệ thống đèn giao thông chuyển màu tự động theo chu kỳ (Đỏ - Xanh - Vàng). LED 7 đoạn hiển thị thời gian đếm ngược của mỗi làn đường.
+        \item \textit{Chuyển trạng thái}: Khi bấm \texttt{Button 1}, FSM chuyển sang \textbf{MODE 2}.
+    \end{itemize}
+    
+    \item \textbf{MODE 2 - Cài đặt thời gian đèn Đỏ:}
+    \begin{itemize}
+        \item \textit{Hành vi}: Tất cả đèn Đỏ nhấp nháy ở tần số $2\text{Hz}$. 2 LED 7 đoạn hiển thị mã Mode \texttt{02}, 2 LED còn lại hiển thị giá trị thời gian đèn Đỏ đang chỉnh.
+        \item \textit{Thao tác}: Bấm \texttt{Button 2} để tăng thời gian ($1 \rightarrow 99$), bấm \texttt{Button 3} để lưu giá trị.
+        \item \textit{Chuyển trạng thái}: Khi bấm \texttt{Button 1}, FSM chuyển sang \textbf{MODE 3}.
+    \end{itemize}
+
+    \item \textbf{MODE 3 - Cài đặt thời gian đèn Vàng:}
+    \begin{itemize}
+        \item \textit{Hành vi}: Tất cả đèn Vàng nhấp nháy ở tần số $2\text{Hz}$. 2 LED 7 đoạn hiển thị mã Mode \texttt{03}, 2 LED còn lại hiển thị giá trị thời gian đèn Vàng.
+        \item \textit{Thao tác}: Bấm \texttt{Button 2} để tăng thời gian, bấm \texttt{Button 3} để lưu giá trị.
+        \item \textit{Chuyển trạng thái}: Khi bấm \texttt{Button 1}, FSM chuyển sang \textbf{MODE 4}.
+    \end{itemize}
+
+    \item \textbf{MODE 4 - Cài đặt thời gian đèn Xanh:}
+    \begin{itemize}
+        \item \textit{Hành vi}: Tất cả đèn Xanh nhấp nháy ở tần số $2\text{Hz}$. 2 LED 7 đoạn hiển thị mã Mode \texttt{04}, 2 LED còn lại hiển thị giá trị thời gian đèn Xanh.
+        \item \textit{Thao tác}: Bấm \texttt{Button 2} để tăng thời gian, bấm \texttt{Button 3} để lưu giá trị.
+        \item \textit{Chuyển trạng thái}: Khi bấm \texttt{Button 1}, FSM quay trở lại \textbf{MODE 1}.
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Bảng chuyển trạng thái và sơ đồ FSM}
+\begin{table}[htbp]
+\centering
+\caption{Bảng chuyển đổi trạng thái của FSM theo sự kiện nút nhấn}
+\label{tab:fsm_transition}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Hiện tại} & \textbf{Đầu vào} & \textbf{Kế tiếp} & \textbf{Hành động} \\ \hline
+\texttt{MODE\_1} & Press Button 1 & \texttt{MODE\_2} & Bật nháy LED Đỏ 2Hz, hiển thị Mode 02 \\ \hline
+\texttt{MODE\_2} & Press Button 2 & \texttt{MODE\_2} & Tăng giá trị tạm thời \texttt{temp\_red\_time} \\ \hline
+\texttt{MODE\_2} & Press Button 3 & \texttt{MODE\_2} & Lưu \texttt{red\_time = temp\_red\_time} \\ \hline
+\texttt{MODE\_2} & Press Button 1 & \texttt{MODE\_3} & Bật nháy LED Vàng 2Hz, hiển thị Mode 03 \\ \hline
+\texttt{MODE\_3} & Press Button 2 & \texttt{MODE\_3} & Tăng giá trị tạm thời \texttt{temp\_amber\_time} \\ \hline
+\texttt{MODE\_3} & Press Button 3 & \texttt{MODE\_3} & Lưu \texttt{amber\_time = temp\_amber\_time} \\ \hline
+\texttt{MODE\_3} & Press Button 1 & \texttt{MODE\_4} & Bật nháy LED Xanh 2Hz, hiển thị Mode 04 \\ \hline
+\texttt{MODE\_4} & Press Button 2 & \texttt{MODE\_4} & Tăng giá trị tạm thời \texttt{temp\_green\_time} \\ \hline
+\texttt{MODE\_4} & Press Button 3 & \texttt{MODE\_4} & Lưu \texttt{green\_time = temp\_green\_time} \\ \hline
+\texttt{MODE\_4} & Press Button 1 & \texttt{MODE\_1} & Cập nhật chu kỳ mới và chạy tự động \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[->, >=stealth', shorten >=1pt, auto, node distance=4cm, semithick,
+    state/.style={circle, draw=blue!80, fill=blue!10, thick, minimum size=2.2cm, align=center, font=\small\bfseries}]
+
+    % Nodes
+    \node[state] (m1) {\texttt{MODE 1}\\Normal};
+    \node[state] (m2) [right of=m1] {\texttt{MODE 2}\\Modify\\Red};
+    \node[state] (m3) [below of=m2] {\texttt{MODE 3}\\Modify\\Amber};
+    \node[state] (m4) [below of=m1] {\texttt{MODE 4}\\Modify\\Green};
+
+    % Transitions
+    \path (m1) edge [bend left] node [above] {Button 1} (m2)
+          (m2) edge [bend left] node [right] {Button 1} (m3)
+          (m3) edge [bend left] node [below] {Button 1} (m4)
+          (m4) edge [bend left] node [left]  {Button 1} (m1);
+
+    % Self loops
+    \path (m2) edge [loop above] node [align=center] {Button 2: Inc\\Button 3: Set} (m2)
+          (m3) edge [loop right] node [align=center] {Button 2: Inc\\Button 3: Set} (m3)
+          (m4) edge [loop below] node [align=center] {Button 2: Inc\\Button 3: Set} (m4);
+
+\end{tikzpicture}
+\caption{Sơ đồ chuyển trạng thái (FSM) cho hệ thống đèn giao thông}
+\label{fig:fsm_diagram}
+\end{figure}
