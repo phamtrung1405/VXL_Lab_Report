@@ -1,2 +1,89 @@
 \subsection{Exercise 3 - Lab 2}
 
+\textbf{Mục tiêu \& Yêu cầu:}
+\begin{itemize}
+    \item Hiện thực hàm \texttt{update7SEG(int index)} để quét và hiển thị giá trị từ mảng \texttt{led\_buffer[4]} lên 4 LED 7 đoạn tương ứng.
+    \item Hàm nhận tham số \texttt{index} từ $0$ đến $3$, tương ứng với vị trí của 4 LED 7 đoạn.
+    \item Gọi hàm \texttt{update7SEG(index\_led++)} bên trong hàm ngắt Timer Callback (\texttt{HAL\_TIM\_PeriodElapsedCallback}) và cập nhật biến \texttt{index\_led} quay vòng trong khoảng từ $0$ đến $3$.
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Report 1: Mã nguồn của hàm \texttt{update7SEG}}
+
+Đoạn mã hiện thực hàm \texttt{update7SEG(int index)} sử dụng câu lệnh \texttt{switch-case} để hiển thị từng LED 7 đoạn:
+
+\begin{lstlisting}[language=C, caption={Hàm update7SEG hiển thị dữ liệu từ led\_buffer}, label={lst:lab2_ex3_update7seg}]
+/* USER CODE BEGIN 4 */
+const int MAX_LED = 4;
+int index_led = 0;
+int led_buffer [4] = {1, 2, 3, 4};
+void update7SEG (int index){
+    switch (index){
+    case 0:
+        HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_SET);
+        display7SEG(led_buffer[0]);
+        HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
+        break ;
+    case 1:
+        HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_SET);
+        display7SEG(led_buffer[1]);
+        HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
+        break ;
+    case 2:
+        HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_SET);
+        display7SEG(led_buffer[2]);
+        HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_RESET);
+        break ;
+    case 3:
+        HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_SET);
+        display7SEG(led_buffer[3]);
+        HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_RESET);
+        break ;
+    default :
+        break ;
+    }
+}
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\textbf{Report 2: Mã nguồn trong hàm ngắt Timer Callback}
+
+Mã nguồn xử lý gọi hàm \texttt{update7SEG} và tự động cập nhật \texttt{index\_led} trong hàm ngắt Timer:
+
+\begin{lstlisting}[language=C, caption={Xử lý quét LED 7 đoạn trong hàm ngắt Timer Callback}, label={lst:lab2_ex3_callback}]
+int counter = 50;
+int counter1 = 100;
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+        counter--;
+        counter1--;
+
+        if (counter1 <= 0)
+        {
+            counter1 = 100;
+            HAL_GPIO_TogglePin ( DOT_GPIO_Port , DOT_Pin );
+        }
+
+        if (counter <= 0)
+        {
+            counter = 50;
+            update7SEG(index_led ++);
+            if (index_led > MAX_LED - 1) index_led = 0;
+        }
+    }
+}
+/* USER CODE END 4 */
+\end{lstlisting}

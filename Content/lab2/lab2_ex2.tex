@@ -1,2 +1,105 @@
 \subsection{Exercise 2 - Lab 2}
 
+\textbf{Mục tiêu \& Yêu cầu:}
+\begin{itemize}
+    \item Mở rộng sơ đồ nguyên lý lên 4 LED 7 đoạn Anode chung (điều khiển nguồn qua 4 Transistor PNP với các chân \texttt{EN0}, \texttt{EN1}, \texttt{EN2}, \texttt{EN3}) và tích hợp 2 đèn \texttt{LED-RED} nối với chân \texttt{PA4} (nhãn \texttt{DOT}) nằm ở giữa.
+    \item Lập trình trong hàm ngắt Timer Callback cho 2 đèn \texttt{DOT} nhấp nháy mỗi $1$ giây ($1000\text{ms}$).
+    \item Hiển thị số \textbf{"3"} trên LED 7 đoạn thứ 3 và số \textbf{"0"} trên LED 7 đoạn thứ 4 (mô phỏng thời gian 12 giờ 30 phút).
+    \item Thời gian chuyển đổi (quét) cho mỗi LED 7 đoạn là $0.5$ giây ($500\text{ms}$).
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Report 1: Sơ đồ nguyên lý (Schematic)}
+
+\begin{center}
+    \includegraphics[width=9.5cm]{Picture/lab2_ex2.png}\\[0.2cm]
+    {\small \textit{Hình 2.2: Sơ đồ mạch mô phỏng Proteus giao tiếp 4 LED 7 đoạn và 2 LED DOT (Link Proteus: \href{https://github.com/lanton0403/VXL_VDK_Lab/raw/refs/heads/main/Lab_2/Exercise_2/Proteus/Lab2_1.pdsprj}{Download})}}
+\end{center}
+
+\vspace{0.3cm}
+
+\textbf{Report 2: Mã nguồn trong hàm ngắt Timer Callback}
+
+Đoạn mã xử lý quét 4 LED 7 đoạn và đảo trạng thái 2 LED \texttt{DOT} triển khai trong hàm \texttt{HAL\_TIM\_PeriodElapsedCallback}:
+
+\begin{lstlisting}[language=C, caption={Hàm ngắt Timer điều khiển quét 4 LED 7 đoạn và chớp tắt 2 LED DOT}, label={lst:lab2_ex2_code}]
+/* USER CODE BEGIN 4 */
+int led = 0;
+int counter = 50;
+int counter1 = 100;
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+        counter--;
+        counter1--;
+
+        if (counter1 <= 0)
+        {
+        	counter1 = 100;
+        	HAL_GPIO_TogglePin ( DOT_GPIO_Port , DOT_Pin );
+        }
+
+        if (counter <= 0)
+        {
+            counter = 50;
+
+            if (led == 0)
+            {
+                HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_SET);
+                display7SEG(1);
+                HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_RESET);
+
+                led = 1;
+            }
+            else if (led == 1)
+            {
+            	HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
+            	HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_SET);
+            	HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_SET);
+                display7SEG(2);
+                HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_RESET);
+
+                led = 2;
+            }
+            else if (led == 2)
+            {
+            	HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
+            	HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
+            	HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_SET);
+                display7SEG(3);
+                HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_RESET);
+
+                led = 3;
+            }
+            else
+            {
+            	HAL_GPIO_WritePin(GPIOA, EN0_Pin, GPIO_PIN_SET);
+            	HAL_GPIO_WritePin(GPIOA, EN1_Pin, GPIO_PIN_SET);
+            	HAL_GPIO_WritePin(GPIOA, EN2_Pin, GPIO_PIN_SET);
+                display7SEG(0);
+                HAL_GPIO_WritePin(GPIOA, EN3_Pin, GPIO_PIN_RESET);
+
+                led = 0;
+            }
+        }
+    }
+}
+/* USER CODE END 4 */
+
+\end{lstlisting}
+
+\vspace{0.3cm}
+
+\textbf{Short question: Tần số của quá trình quét LED là bao nhiêu?}
+\begin{itemize}
+    \item \textbf{Trả lời:} 
+    Chu kỳ quét cho từng LED 7 đoạn là $T_S = 0.5\text{s}$ ($500\text{ms}$). Do hệ thống quét luân phiên toàn bộ $4$ LED 7 đoạn, tổng chu kỳ để quét xong 1 lượt tất cả các LED là:
+    $$T_{scan} = 4 \times T_S = 4 \times 0.5\text{s} = 2.0\text{s}$$
+    Tần số của quá trình quét (Scanning Frequency) là:
+    $$f_{scan} = \frac{1}{T_{scan}} = \frac{1}{2.0\text{s}} = 0.5\text{Hz}$$
+\end{itemize}

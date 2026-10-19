@@ -1,2 +1,41 @@
 \subsection{Exercise 4 - Lab 2}
 
+\textbf{Mục tiêu \& Yêu cầu:}
+\begin{itemize}
+    \item Thay đổi chu kỳ gọi hàm \texttt{update7SEG} trong hàm ngắt Timer để thiết lập tần số quét của toàn bộ $4$ LED 7 đoạn về $1\text{Hz}$.
+    \item Để đạt tần số quét $f_{scan} = 1\text{Hz}$ cho $4$ LED, thời gian quét giữa mỗi LED $T_S$ cần chuyển về $250\text{ms}$ ($1\text{s} / 4 = 0.25\text{s}$).
+    \item Đèn \texttt{DOT} vẫn tiếp tục nhấp nháy định kỳ mỗi $1$ giây ($1000\text{ms}$).
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Report 1: Mã nguồn trong hàm ngắt Timer Callback}
+
+Mã nguồn điều chỉnh biến đếm \texttt{counter} về $25$ ($25 \times 10\text{ms} = 250\text{ms}$) để đạt tần số quét $1\text{Hz}$ triển khai trong hàm \texttt{HAL\_TIM\_PeriodElapsedCallback}:
+
+\begin{lstlisting}[language=C, caption={Cấu hình quét 4 LED 7 đoạn tần số 1Hz trong hàm ngắt Timer}, label={lst:lab2_ex4_callback}]
+int counter = 25;
+int counter1 = 100;
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+        counter--;
+        counter1--;
+
+        if (counter1 <= 0)
+        {
+        	counter1 = 100;
+        	HAL_GPIO_TogglePin ( DOT_GPIO_Port , DOT_Pin );
+        }
+
+        if (counter <= 0)
+        {
+            counter = 25;
+            update7SEG(index_led ++);
+            if (index_led > MAX_LED - 1) index_led = 0;
+        }
+    }
+}
+\end{lstlisting}

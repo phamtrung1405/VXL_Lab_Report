@@ -1,2 +1,24 @@
 \subsection{Exercise 5 - Lab 2}
 
+\textbf{Mục tiêu \& Yêu cầu:}
+\begin{itemize}
+    \item Hiện thực đồng hồ số hiển thị thông tin Giờ (\texttt{hour}) và Phút (\texttt{minute}) trên 4 LED 7 đoạn.
+    \item Viết hàm \texttt{updateClockBuffer()} để tách các giá trị giờ, phút thành các chữ số hàng chục và hàng đơn vị, sau đó gán vào mảng \texttt{led\_buffer[4]}.
+    \item Trong trường hợp giá trị giờ hoặc phút là số có 1 chữ số (nhỏ hơn $10$), hệ thống tự động thêm số $0$ vào phía trước (ví dụ: $8$ phút $\rightarrow$ \texttt{08}).
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Report 1: Mã nguồn của hàm \texttt{updateClockBuffer}}
+
+Đoạn mã hiện thực hàm \texttt{updateClockBuffer()} xử lý tách chữ số hàng chục và hàng đơn vị của giờ và phút để cập nhật vào \texttt{led\_buffer}:
+
+\begin{lstlisting}[language=C, caption={Hàm updateClockBuffer tách chữ số giờ và phút vào led\_buffer}, label={lst:lab2_ex5_updatebuffer}]
+void updateClockBuffer(void) {
+    led_buffer[0] = hour / 10;
+    led_buffer[1] = hour % 10;
+
+    led_buffer[2] = minute / 10;
+    led_buffer[3] = minute % 10;
+}
+\end{lstlisting}
