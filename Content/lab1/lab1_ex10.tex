@@ -1,4 +1,4 @@
-\section{Exercise 10 - Lab 1}
+\subsection{Exercise 10 - Lab 1}
 Yêu cầu:Tích hợp toàn bộ các hàm đã xây dựng từ những bài tập trước để tạo thành một hệ thống đồng hồ sử dụng 12 đèn LED[cite: 30]. Tại bất kỳ thời điểm nào, chỉ có 3 đèn LED được phép bật sáng để thể hiện lần lượt 3 thông tin: giờ, phút và giây[cite: 30].
 
 Ý tưởng: 12 bóng LED này được kết nối trực tiếp với 12 chân GPIO liên tiếp của vi điều khiển STM32, bắt đầu từ chân \texttt{PA4} đến \texttt{PA15}[cite: 29]. Nhóm chọn chân \texttt{PA15} tương ứng với vị trí 12 giờ, \texttt{PA4} là 1 giờ. Để điều khiển đồng hồ, hệ thống sử dụng lại các hàm phụ trợ đã được yêu cầu ở các bài tập 7, 8 và 9[cite: 30]. Do phút và giây là từ 0 đến 59, trong khi mặt đồng hồ chỉ có 12 vị trí (0 đến 11), hệ thống chia lấy phần nguyên của giá trị phút và giây cho 5 để ánh xạ vào đúng vị trí của đèn LED tương ứng. Nhịp đếm thời gian 1 giây được tạo ra thông qua hàm \texttt{HAL\_Delay(1000)}. Trong trường hợp giá trị của kim giây, kim phút và kim giờ trùng nhau tại một vị trí, chân GPIO tương ứng của vị trí đó vẫn sẽ duy trì trạng thái mức cao (bật sáng) bình thường.
