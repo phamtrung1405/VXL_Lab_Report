@@ -1,2 +1,52 @@
 \subsection{Exercise 2 - Lab 1}
 
+\textbf{Mục tiêu \& Yêu cầu:}
+\begin{itemize}
+    \item Mở rộng Exercise 1 để mô phỏng hệ thống đèn giao thông đơn giản bằng cách kết nối thêm đèn \texttt{LED-GREEN} vào chân \texttt{PA7} của STM32 (chân âm của LED nối đất).
+    \item Lập trình chu kỳ chuyển đổi trạng thái đèn giao thông:
+    \begin{itemize}
+        \item Đèn \texttt{RED} sáng trong $5$ giây.
+        \item Đèn \texttt{YELLOW} sáng trong $2$ giây.
+        \item Đèn \texttt{GREEN} sáng trong $3$ giây.
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Report 1: Sơ đồ nguyên lý (Schematic)}
+
+\begin{center}
+    \includegraphics[width=9cm]{Picture/lab1_ex2.png}\\[0.2cm]
+    {\small \textit{Hình 1.2: Sơ đồ mạch mô phỏng Proteus cho Exercise 2 (Link Proteus: \href{https://github.com/lanton0403/VXL_VDK_Lab/raw/refs/heads/main/Lab_1/Exercise_2/Proteus/STM32.pdsprj}{Download})}}
+\end{center}
+
+\vspace{0.3cm}
+
+\textbf{Report 2: Đoạn chương trình thực thi}
+
+Đoạn mã nguồn triển khai trong vòng lặp \texttt{while(1)} mô phỏng chu kỳ đèn giao thông 3 màu:
+
+\begin{lstlisting}[language=C, caption={Chương trình điều khiển đèn giao thông (Đỏ 5s - Vàng 2s - Xanh 3s)}, label={lst:lab1_ex2_code}]
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+    HAL_GPIO_WritePin ( LED_GREEN_GPIO_Port , LED_GREEN_Pin , GPIO_PIN_RESET );
+    HAL_GPIO_WritePin ( LED_YELLOW_GPIO_Port , LED_YELLOW_Pin , GPIO_PIN_SET );
+    HAL_GPIO_WritePin ( LED_RED_GPIO_Port , LED_RED_Pin , GPIO_PIN_SET );
+    HAL_Delay (3000) ;
+
+    HAL_GPIO_WritePin ( LED_GREEN_GPIO_Port , LED_GREEN_Pin , GPIO_PIN_SET );
+    HAL_GPIO_WritePin ( LED_YELLOW_GPIO_Port , LED_YELLOW_Pin , GPIO_PIN_RESET );
+    HAL_GPIO_WritePin ( LED_RED_GPIO_Port , LED_RED_Pin , GPIO_PIN_SET );
+    HAL_Delay (2000) ;
+
+    HAL_GPIO_WritePin ( LED_GREEN_GPIO_Port , LED_GREEN_Pin , GPIO_PIN_SET );
+    HAL_GPIO_WritePin ( LED_YELLOW_GPIO_Port , LED_YELLOW_Pin , GPIO_PIN_SET );
+    HAL_GPIO_WritePin ( LED_RED_GPIO_Port , LED_RED_Pin , GPIO_PIN_RESET );
+    HAL_Delay (5000) ;
+/* USER CODE END WHILE */
+
+/* USER CODE BEGIN 3 */
+}
+
+\end{lstlisting}

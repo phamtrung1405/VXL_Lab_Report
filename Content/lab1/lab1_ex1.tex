@@ -1,2 +1,38 @@
 \subsection{Exercise 1 - Lab 1}
 
+\textbf{Mục tiêu \& Yêu cầu:}
+\begin{itemize}
+    \item Kết nối thêm 1 đèn \texttt{LED-YELLOW} vào chân \texttt{PA6} của vi điều khiển STM32 (chân âm của LED nối đất).
+    \item Lập trình chuyển đổi trạng thái luân phiên giữa 2 đèn \texttt{LED-RED} (\texttt{PA5}) và \texttt{LED-YELLOW} (\texttt{PA6}) mỗi $2$ giây (khi LED này bật thì LED kia tắt).
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Report 1: Sơ đồ nguyên lý (Schematic)}
+
+\begin{center}
+    \includegraphics[width=9cm]{Picture/lab1_ex1.png}\\[0.2cm]
+    {\small \textit{Hình 1.1: Sơ đồ mạch mô phỏng Proteus cho Exercise 1 (Link Proteus: \href{https://github.com/lanton0403/VXL_VDK_Lab/raw/refs/heads/main/Lab_1/Exercise_1/Proteus/STM32.pdsprj}{Download})}}
+\end{center}
+
+\vspace{0.3cm}
+
+\textbf{Report 2: Đoạn chương trình thực thi}
+
+Hình ảnh/Đoạn mã mã nguồn triển khai vòng lặp \texttt{while(1)} điều khiển 2 LED luân phiên:
+
+\begin{lstlisting}[language=C, caption={Chương trình chuyển trạng thái 2 LED mỗi 2s}, label={lst:lab1_ex1_code}]
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+    HAL_GPIO_WritePin ( LED_RED_GPIO_Port , LED_RED_Pin , GPIO_PIN_SET );
+    HAL_GPIO_WritePin ( LED_YELLOW_GPIO_Port , LED_YELLOW_Pin , GPIO_PIN_RESET );
+    HAL_Delay (2000) ;
+    HAL_GPIO_WritePin ( LED_RED_GPIO_Port , LED_RED_Pin , GPIO_PIN_RESET );
+    HAL_GPIO_WritePin ( LED_YELLOW_GPIO_Port , LED_YELLOW_Pin , GPIO_PIN_SET );
+    HAL_Delay (2000) ;    
+/* USER CODE END WHILE */
+
+/* USER CODE BEGIN 3 */
+}
+\end{lstlisting}
