@@ -1,0 +1,7 @@
+input_processing.c:25:6:resetCountValue	8	static
+input_processing.c:33:6:UpdateMode	8	static
+input_processing.c:73:13:increaseTempValue	4	static
+input_processing.c:90:13:setDurationValue	4	static
+input_processing.c:129:6:UpdateDurationValue	8	static
+input_processing.c:178:6:fsm_for_input_processing	8	static
+input_processing.c:183:6:fsm_traffic_light_run	8	static
