@@ -1,2 +1,54 @@
 \subsection{Exercise 6 - Lab 3}
 
+\textbf{1. Yêu cầu}
+\begin{itemize}
+    \item Thiết kế và triển khai trạng thái \texttt{MODE 4} trong hệ thống FSM đèn giao thông để điều chỉnh thời gian sáng của \textbf{đèn Xanh} (Green Light).
+    \item Tích hợp cơ chế nhấp nháy đèn Xanh với tần số $2\text{ Hz}$ và cập nhật giá trị cài đặt mới vào hệ thống.
+\end{itemize}
+
+\textbf{2. Mô tả yêu cầu và hành vi hệ thống}
+\begin{enumerate}
+    \item \textbf{Chuyển chế độ (Mode Selection):} 
+    \begin{itemize}
+        \item Khi nhấn nút \texttt{Button 1} (MODE) từ \texttt{MODE 3}, hệ thống chuyển sang \texttt{MODE 4}.
+        \item Hai LED 7 đoạn đầu tiên hiển thị mã chế độ: \texttt{04}.
+    \end{itemize}
+    
+    \item \textbf{Trạng thái tín hiệu (LED Status):}
+    \begin{itemize}
+        \item Tất cả các đèn Xanh trên cả hai làn đường nhấp nháy đồng bộ với chu kỳ $500\text{ ms}$ (tương ứng tần số $2\text{ Hz}$).
+        \item Các đèn Đỏ và Vàng duy trì trạng thái TẮT.
+    \end{itemize}
+    
+    \item \textbf{Thao tác cài đặt (Modification \& Saving):}
+    \begin{itemize}
+        \item \textbf{Button 2 (MODIFY):} Nhấn để tăng giá trị thời gian tạm thời cho đèn Xanh (tăng từ $1$ đến $99$ giây, quay về $1$ khi vượt quá $99$). Hai LED 7 đoạn sau hiển thị giá trị tạm thời này.
+        \item \textbf{Button 3 (SET):} Nhấn để lưu giá trị thời gian đèn Xanh mới vào cấu hình chính của hệ thống.
+    \end{itemize}
+\end{enumerate}
+
+\textbf{3. Bảng trạng thái FSM cho Mode 4}
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{|c|c|c|p{6cm}|}
+        \hline
+        \textbf{Trạng thái} & \textbf{Sự kiện (Input)} & \textbf{Trạng thái kế} & \textbf{Hành vi xuất (Output)} \\ \hline
+        \texttt{MODE\_4} & Press \texttt{Btn1} & \texttt{MODE\_1} & Chuyển về chế độ vận hành tự động ban đầu. \\ \hline
+        \texttt{MODE\_4} & Press \texttt{Btn2} & \texttt{MODE\_4} & Tăng giá trị thời gian tạm thời ($+1$). Hiển thị lên LED 7 đoạn. \\ \hline
+        \texttt{MODE\_4} & Press \texttt{Btn3} & \texttt{MODE\_4} & Cập nhật thời gian đèn Xanh chính thức vào hệ thống. \\ \hline
+        \texttt{MODE\_4} & Timer $250\text{ms}$ & \texttt{MODE\_4} & Đảo trạng thái đèn Xanh để tạo hiệu ứng nhấp nháy $2\text{ Hz}$. \\ \hline
+    \end{tabular}
+    \caption{Bảng chuyển trạng thái FSM cho chế độ Mode 4}
+    \label{tab:fsm_mode4}
+\end{table}
+
+\textbf{4. Kết quả mô phỏng và thực nghiệm}
+\begin{figure}[htbp]
+    \centering
+    \caption{Mô phỏng hoạt động của hệ thống ở Mode 4}
+    \label{fig:lab3_ex6}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Nhận xét kết quả:} Đèn Xanh nhấp nháy đúng tần số $2\text{ Hz}$, các thao tác chuyển chế độ và lưu giá trị hoạt động chính xác theo yêu cầu đề bài.
+\end{itemize}
