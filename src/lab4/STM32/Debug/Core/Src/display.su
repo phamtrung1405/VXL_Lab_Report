@@ -1,0 +1,6 @@
+display.c:13:6:Print_Timestamp_10ms	64	static
+display.c:20:6:LED0_Display	64	static
+display.c:30:6:LED1_Display	64	static
+display.c:40:6:LED2_Display	64	static
+display.c:50:6:LED3_Display	64	static
+display.c:60:6:LED4_Display	64	static
